@@ -38,17 +38,25 @@ def inicia_programa():
         print('> ')
         print('> A partida vai começar, preparem-se!')
         comeca_jogo()
-
+    
     elif resposta == 2:
         print('> ')
         r.regras()
-            
+        jogar = input('Deseja jogar agora? (y/n)')
+
+        if jogar == 'y':
+            comeca_jogo()
+        else:
+            print('> Até a próxima então!')
+
     elif resposta == 3:
         print('> ')
         print('> Até a próxima!')
-    
+
     else:
-        raise Exception('Somente inputs de 1 a 3.')
+        print('> ')
+        print('> Somente inputs de 1 a 3.')
+        inicia_programa()
 
 def controla_jogo():
 
@@ -85,6 +93,7 @@ def controla_jogo():
     print('> Alexa, toque Sweet Victory do David Glen!')
 
 def conta_pecas():
+    global vencedor
     pecas_pretas = 0
     pecas_brancas = 0
 

@@ -1,6 +1,3 @@
-#--------Imports
-import main as mn
-
 #--------Regras
 def regras():
     regras = """"
@@ -131,13 +128,4 @@ def regras():
 
 ----------Fim----------
     """
-
     print(regras)
-    
-    jogar = input('Deseja jogar agora? (y/n)')
-
-    if jogar == 'y':
-        mn.comeca_jogo()
-
-    else:
-        print('> Até a próxima então!')
