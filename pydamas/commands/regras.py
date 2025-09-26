@@ -1,6 +1,7 @@
 #--------Regras
 def regras():
     regras = """"
+>
 ----------Regras----------
 > O jogo de damas é praticado em um tabuleiro de 64 casas, claras e escuras. 
 > A grande diagonal (escura), deve ficar sempre à esquerda de cada jogador. 
