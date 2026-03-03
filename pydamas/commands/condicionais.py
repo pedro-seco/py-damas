@@ -1,5 +1,3 @@
-
-from pydamas.commands import tabuleiro as tb
 from pydamas.utils import extras as ex
 
 def e_jogador_branco() -> bool:
@@ -12,13 +10,24 @@ def e_jogador_preto() -> bool:
         return True
     return False
 
+def e_quadrado_branco(tile:str) -> bool:
+    if ex.acessa_tile(tile)[1] == ex.QUADRADO_BRANCO:
+        return True
+    return False
+
+def e_quadrado_preto(tile:str) -> bool:
+    if ex.acessa_tile(tile)[1] == ex.QUADRADO_PRETO:
+        return True
+    return False
+
+
 def e_peca_branca(tile:str) -> bool:
-    if tb.acessa_tile(tile)[2] == "Peça Branca" or tb.acessa_tile(tile)[2] == "Rainha Branca":
+    if ex.acessa_tile(tile)[2] == ex.PECA_BRANCA or ex.acessa_tile(tile)[2] == ex.RAINHA_BRANCA:
         return True
     return False
 
 def e_peca_preta(tile:str) -> bool:
-    if tb.acessa_tile(tile)[2] == "Peça Preta" or tb.acessa_tile(tile)[2] == "Rainha Preta":
+    if ex.acessa_tile(tile)[2] == ex.PECA_PRETA or ex.acessa_tile(tile)[2] == ex.RAINHA_PRETA:
         return True
     return False
 
@@ -28,18 +37,18 @@ def e_quadrado(lista:list) -> bool:
     return False
 
 def e_rainha(tile:str) -> bool:
-    if tb.acessa_tile(tile)[2] == "Rainha Branca" or tb.acessa_tile(tile)[2] == "Rainha Preta":
+    if ex.acessa_tile(tile)[2] == ex.RAINHA_BRANCA or ex.acessa_tile(tile)[2] == ex.RAINHA_PRETA:
         return True
     return False
 
 def e_vazio(tile:str) -> bool:
-    if tb.acessa_tile(tile)[2] == "Vazio":
+    if ex.acessa_tile(tile)[2] == ex.VAZIO:
         return True
     return False
 
 def e_come_peca(origem:str, destino:str) -> bool:
-    distancia = tb.calcula_distancia(origem, destino)
-    pecaCaminho = tb.acessa_tile(destino, distancia[1]//2, distancia[0]//2)[0]
+    distancia = ex.calcula_distancia(origem, destino)
+    pecaCaminho = ex.acessa_tile(destino, distancia[1]//2, distancia[0]//2)[0]
 
     if e_jogador_branco() and e_peca_branca(origem) and e_peca_preta(pecaCaminho) and e_vazio(destino):
         return True
@@ -50,8 +59,11 @@ def e_come_peca(origem:str, destino:str) -> bool:
     return False
 
 def e_come_rainha(origem:str, destino:str) -> bool:
-    caminho = tb.define_caminho(origem,destino)
+    caminho = define_caminho(origem,destino)
     
+    if caminho is None:
+        return False
+
     if not e_move_rainha(origem,caminho[:-2]):
         return False
     
@@ -65,7 +77,7 @@ def e_come_rainha(origem:str, destino:str) -> bool:
     return False
 
 def e_move_peca(origem:str, destino:str) -> bool:
-    distancia = tb.calcula_distancia(origem, destino)
+    distancia = ex.calcula_distancia(origem, destino)
 
     if not e_vazio(destino):
         return False
@@ -73,6 +85,7 @@ def e_move_peca(origem:str, destino:str) -> bool:
     if e_jogador_branco() and e_peca_branca(origem) and (distancia == [-1,1] or distancia == [-1,-1]):
         return True
     
+
     if e_jogador_preto() and e_peca_preta(origem) and (distancia == [1,-1] or distancia == [1,1]):
         return True
     
@@ -80,17 +93,20 @@ def e_move_peca(origem:str, destino:str) -> bool:
 
 
 def e_move_rainha(origem:str, destino:str) -> bool:
-    caminho = tb.define_caminho(origem,destino)
-
+    caminho = define_caminho(origem,destino)
+    
+    if caminho is None:
+        return False
+    
     for tile in caminho:
-        if not tb.acessa_tile(tile)[2] == "Vazio":
+        if not e_vazio(tile):
             return False
         
     return True
 
 def peca_come_mais(tile:str) -> bool:
-    tb.cria_diagonais(tile)
-    for quadrante in tb.diagonais:
+    define_diagonais(tile)
+    for quadrante in ex.diagonais:
         if e_vazio(quadrante[1]):
             if e_jogador_branco() and e_peca_preta(quadrante[0]):
                 return True
@@ -100,9 +116,9 @@ def peca_come_mais(tile:str) -> bool:
             
     return False
 
-def rainha_come_mais(tile:str) ->bool:
-    tb.cria_diagonais(tile)
-    for quadrante in tb.diagonais:
+def rainha_come_mais(tile:str) -> bool:
+    define_diagonais(tile)
+    for quadrante in ex.diagonais:
         if e_move_rainha(quadrante[0],quadrante[-3]) and e_vazio(quadrante[-1]):
             if e_jogador_branco() and e_peca_branca(tile) and e_peca_preta(quadrante[-2]):
                 return True
@@ -117,37 +133,90 @@ def qual_direcao(lista:list) -> int:
     if linha < 0 and coluna < 0:
         return ex.PRIMEIRO_QUADRANTE
     
-    if linha < 0 and coluna > 0:
+    elif linha < 0 and coluna > 0:
         return ex.SEGUNDO_QUADRANTE
     
-    if linha > 0 and coluna < 0:
+    elif linha > 0 and coluna < 0:
         return ex.TERCEIRO_QUADRANTE
     
-    if linha > 0 and coluna > 0:
+    elif linha > 0 and coluna > 0:
         return ex.QUARTO_QUADRANTE
     
     else:
         return 0
+    
+def contas_pecas() -> list:
+    pecasPretas = 0
+    pecasBrancas = 0
+
+    for coordenada in ex.coordenadas:
+            if e_peca_branca(coordenada):
+                pecasPretas += 1
+
+            if e_peca_preta(coordenada):
+                pecasBrancas += 1
+    
+    return [pecasBrancas, pecasPretas]
 
 def e_vencedor_branco() -> bool:
-    pecas = tb.contas_pecas()
+    pecas = contas_pecas()
 
     if e_fim_partida() and pecas[ex.JOGADOR_PRETO] == 0:
         return True
     return False
 
+
 def e_vencedor_preto() -> bool:
-    pecas = tb.contas_pecas()
+    pecas = contas_pecas()
 
     if e_fim_partida() and pecas[ex.JOGADOR_BRANCO] == 0:
         return True
     return False
 
 def e_fim_partida() -> bool:
-     pecas = tb.contas_pecas()
+     pecas = contas_pecas()
 
      if pecas[ex.JOGADOR_BRANCO] == 0 or pecas[ex.JOGADOR_PRETO] == 0:
         return True
-     
      return False
 
+def e_par(numero:int) -> bool:
+    if numero % 2 == 0:
+        return True
+    return False
+
+def define_diagonais(coordenada:str) -> list[list]:
+    ex.diagonais = [[],[],[],[]]
+
+    for linha in range(ex.LINHAS):
+        for coluna in range(ex.COLUNAS):
+            listaDist = ex.calcula_distancia(coordenada, ex.tabuleiro[linha][coluna][0])
+        
+            if not e_quadrado(listaDist):
+                continue
+            
+            match qual_direcao(listaDist):
+                case ex.PRIMEIRO_QUADRANTE:
+                    ex.diagonais[0].append(ex.tabuleiro[linha][coluna][0])
+                case ex.SEGUNDO_QUADRANTE: 
+                    ex.diagonais[1].append(ex.tabuleiro[linha][coluna][0])
+                case ex.TERCEIRO_QUADRANTE:
+                    ex.diagonais[2].append(ex.tabuleiro[linha][coluna][0])
+                case ex.QUARTO_QUADRANTE:
+                    ex.diagonais[3].append(ex.tabuleiro[linha][coluna][0])
+
+    # As lista do primeiro e segundo quadrante precisam ser invertidas
+    # para que elas fiquem na ordem Origem -> Destino
+    ex.diagonais[0].reverse()
+    ex.diagonais[1].reverse()
+    return ex.diagonais
+
+def define_caminho(origem:str, destino:str) -> list:
+    caminho = []
+    define_diagonais(origem)
+
+    for diagonal in ex.diagonais:
+        if destino in diagonal:
+            final = diagonal.index(destino)+1
+            caminho = diagonal[:final]
+            return caminho

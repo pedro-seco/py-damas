@@ -1,7 +1,5 @@
 from pydamas.commands import condicionais as cd
-from pydamas.commands import tabuleiro as tb
-from pydamas.commands import mensagens as msg
-from pydamas.commands import construtores as ct
+from pydamas.commands import impressao as im
 from pydamas.utils import extras as ex
 
 def define_jogada(origem:str, destino:str) -> bool:
@@ -26,20 +24,22 @@ def define_jogada(origem:str, destino:str) -> bool:
             return True
         return False
     
+    print(">  ")
+    print("> Jogada Inválida! Tente Novamente.")
     return True
 
 def move_peca(origem:str,destino:str) -> None:
-    tb.acessa_tile(destino)[2] = tb.acessa_tile(origem)[2]
-    tb.acessa_tile(origem)[2] = "Vazio"
+    ex.acessa_tile(destino)[2] = ex.acessa_tile(origem)[2]
+    ex.acessa_tile(origem)[2] = ex.VAZIO
 
 def come_peca(origem:str,destino:str) -> None:
-    caminho = tb.define_caminho(origem, destino)
-    tb.acessa_tile(caminho[-2])[2] = "Vazio" 
+    caminho = cd.define_caminho(origem, destino)
+    ex.acessa_tile(caminho[-2])[2] = ex.VAZIO
     move_peca(origem,destino)
 
 def setup_jogada(jogador:str, outro_jogador:int) -> None:
-    msg.sua_vez(jogador)
-    ct.imprime_tabuleiro()
+    im.sua_vez(jogador)
+    im.imprime_tabuleiro()
     jogada = input("> Informe seu movimento. (Ex. C6,D5)")
     origem = jogada[:2]
     destino = jogada[3:]
@@ -47,4 +47,4 @@ def setup_jogada(jogador:str, outro_jogador:int) -> None:
     if not define_jogada(origem, destino):
         ex.jogador_vez = outro_jogador
     
-    tb.procura_promo()
+    ex.procura_promo()

@@ -1,93 +1,36 @@
 from pydamas.utils import extras as ex
+from pydamas.commands import condicionais as cd
 
-tabuleiro = []
-
-def constroi_linha(numero:int, primeiro_tile:int, peca = "Vazio", primeira_peca = 0) -> list:
-    tiles = ["Quadrado Branco", "Quadrado Preto"]
-    pecas = ["Vazio", peca]
+def constroi_linha(numero:str) -> list:
     linha = []
+    for letra in ex.LETRAS:
+        linha.append([letra + numero,0,0])
 
-    for letra in range(8):
-            if letra % 2 == 0:
-                linha.append([ex.letras[letra] + numero,tiles[primeiro_tile],pecas[primeira_peca]])
-            else:
-                linha.append([ex.letras[letra] + numero,tiles[primeiro_tile-1],pecas[primeira_peca-1]])
-    
     return linha
 
-def constroi_linha2() -> list:
-    for numero in ex.numeros:
-        linha = []
-        for letra in ex.letras:
-            linha.append([letra + numero,[],[]])
-        tabuleiro.append(linha)
-    
-    return tabuleiro
+def constroi_colunas() -> None:
+    for numero in ex.NUMEROS:
+        ex.tabuleiro.append(constroi_linha(numero))
 
+def constroi_coordenadas() -> None:
+    for letra in ex.LETRAS:
+        for numero in ex.NUMEROS:
+            ex.coordenadas.append(letra + numero)
 
-def faz_tabuleiro() -> list[list]:
+def insere_tiles() -> None:
+    for coordenada in ex.coordenadas:
+        distancia = ex.calcula_distancia("A1",coordenada)
+        
+        if not cd.e_par(distancia[0] + distancia[1]):
+            ex.acessa_tile(coordenada)[1] = ex.QUADRADO_PRETO
+        
+        if cd.e_quadrado_preto(coordenada):
+            if distancia[0] < 3:
+                ex.acessa_tile(coordenada)[2] = ex.PECA_PRETA
+            elif distancia[0] > 4:
+                ex.acessa_tile(coordenada)[2] = ex.PECA_BRANCA
 
-    for num in ex.numeros:
-        if ex.numeros.index(num) < 3:
-            if ex.numeros.index(num) % 2 == 0:
-                tabuleiro.append(constroi_linha(num,0,"Peça Preta",0))
-            else:
-                tabuleiro.append(constroi_linha(num,1,"Peça Preta",1))
-
-        elif ex.numeros.index(num) >= 5:
-            if ex.numeros.index(num) % 2 == 0:
-                tabuleiro.append(constroi_linha(num,0,"Peça Branca",0))
-            else:
-                tabuleiro.append(constroi_linha(num,1,"Peça Branca",1))
-
-        else:
-            if ex.numeros.index(num) % 2 == 0:
-                tabuleiro.append(constroi_linha(num,0))
-            else:
-                tabuleiro.append(constroi_linha(num,1))
-                      
-    return tabuleiro
-
-def imprime_tabuleiro() -> str:
-    linhas = []
-
-    for coluna in range(8):
-        for linha in range(8):
-            codigo = 0
-            linhas_prontas = []
-            for item in ex.pecas_texto:
-                if tabuleiro[coluna][linha][2] == item:
-                    codigo += ex.pecas_texto.index(item)
-            
-            for item2 in ex.pecas_tiles:
-                if tabuleiro[coluna][linha][1] == item2:
-                    codigo += ex.pecas_tiles.index(item2)*10
-
-            str_codigo = str(codigo)
-            for chave in ex.pecas_imagens:
-                if str_codigo == chave:
-                    linhas.append(ex.pecas_imagens.get(str_codigo))
-
-        linhas_prontas = "|".join(linhas)
-        linhas = []
-
-        if coluna == 0:
-            print("> ")
-            print(">       A    B    C    D    E    F    G    H")
-            print(">    ┌----┬┬┬┬┬┬----┬┬┬┬┬┬----┬┬┬┬┬┬----┬┬┬┬┬┐")
-            print("> ",coluna + 1,"  ","|", linhas_prontas,"|","  ", coluna + 1, sep="")
-            print("> "," ","├┬┬┬┬┼┴┴┴┴┼┬┬┬┬┼┴┴┴┴┼┬┬┬┬┼┴┴┴┴┼┬┬┬┬┼┴┴┴┴┤") 
-
-        elif coluna == 7:
-            print("> ",coluna + 1,"  ","|", linhas_prontas,"|","  ", coluna + 1, sep="")
-            print(">    └┴┴┴┴┴----┴┴┴┴┴┴----┴┴┴┴┴┴----┴┴┴┴┴┴----┘")
-            print(">       A    B    C    D    E    F    G    H")
-            print("> ")
-
-        elif coluna % 2 == 0:
-            print("> ",coluna + 1,"  ","|", linhas_prontas,"|","  ", coluna + 1, sep="")
-            print("> "," ","├┬┬┬┬┼┴┴┴┴┼┬┬┬┬┼┴┴┴┴┼┬┬┬┬┼┴┴┴┴┼┬┬┬┬┼┴┴┴┴┤")     
-
-        else:
-            print("> ",coluna + 1,"  ","|", linhas_prontas,"|","  ", coluna + 1, sep="")
-            print("> "," ","├┴┴┴┴┼┬┬┬┬┼┴┴┴┴┼┬┬┬┬┼┴┴┴┴┼┬┬┬┬┼┴┴┴┴┼┬┬┬┬┤")    
+def constroi_tabuleiro() -> None:
+    constroi_coordenadas()
+    constroi_colunas()
+    insere_tiles()
