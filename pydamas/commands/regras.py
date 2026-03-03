@@ -1,9 +1,7 @@
-#--------Imports
-import main as mn
-
 #--------Regras
 def regras():
     regras = """"
+>
 ----------Regras----------
 > O jogo de damas é praticado em um tabuleiro de 64 casas, claras e escuras. 
 > A grande diagonal (escura), deve ficar sempre à esquerda de cada jogador. 
@@ -131,13 +129,4 @@ def regras():
 
 ----------Fim----------
     """
-
     print(regras)
-    
-    jogar = input('Deseja jogar agora? (y/n)')
-
-    if jogar == 'y':
-        mn.comeca_jogo()
-
-    else:
-        print('> Até a próxima então!')
